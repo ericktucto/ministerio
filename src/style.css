@@ -1,0 +1,8 @@
+@import "tailwindcss";
+:root {
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+  }
+}
