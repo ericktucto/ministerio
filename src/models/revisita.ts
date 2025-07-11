@@ -1,14 +1,9 @@
-import { generateId } from "./utils";
+import Model from "./model";
 
-export default class Revisita {
-    protected id: string = '';
+export default class Revisita extends Model {
     protected name: string = '';
     protected lat: number = 0;
     protected log: number = 0;
-
-    protected generateId() {
-        this.id = generateId();
-    }
 
     getId(): string {
         return this.id;
