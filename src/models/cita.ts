@@ -1,13 +1,13 @@
-import Model from "./model";
+import Model, { Attribute } from "./model";
 
 export default class Cita extends Model {
+    @Attribute
     protected date: string = '';
+    @Attribute
     protected revisitaId: string = '';
+    @Attribute
     protected description: string = '';
 
-    getId(): string {
-        return this.id;
-    }
     setDate(date: string) {
         this.date = date;
     }
@@ -31,15 +31,6 @@ export default class Cita extends Model {
     }
     getDescription(): string {
         return this.description;
-    }
-
-    static create(data: Cita): Cita {
-        const entity = new Cita();
-        entity.generateId();
-        entity.date = data.date;
-        entity.revisitaId = data.revisitaId;
-        entity.description = data.description;
-        return entity
     }
 }
 

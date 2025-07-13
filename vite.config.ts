@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite'
 import type { AliasOptions, UserConfigExport } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -22,4 +23,4 @@ export default defineConfig({
             }
         ] as AliasOptions,
     },
-}) satisfies UserConfigExport & VitestConfigExport;
+}) satisfies UserConfigExport;

@@ -1,13 +1,13 @@
-import Model from "./model";
+import Model, { Attribute } from "./model";
 
 export default class Revisita extends Model {
+    @Attribute
     protected name: string = '';
+    @Attribute
     protected lat: number = 0;
+    @Attribute
     protected log: number = 0;
 
-    getId(): string {
-        return this.id;
-    }
     setName(name: string) {
         this.name = name;
     }
@@ -25,14 +25,5 @@ export default class Revisita extends Model {
     }
     getLog(): number {
         return this.log;
-    }
-
-    static create(data: Revisita): Revisita {
-        const entity = new Revisita();
-        entity.generateId();
-        entity.name = data.name;
-        entity.lat = data.lat;
-        entity.log = data.log;
-        return entity
     }
 }
