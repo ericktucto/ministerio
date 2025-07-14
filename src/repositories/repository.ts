@@ -24,13 +24,45 @@ export default abstract class Repository<T extends Model> {
     constructor() {
         const data = localStorage.getItem(`db_${this.getTableName()}`) || '[]';
         try {
-            this.data = JSON.parse(data);
+            this.data = Array.from(
+                JSON.parse(data)
+            ).map(
+                (item) => this.modelClass.make((item as any))
+            );
         } catch (e) {
-            console.log(e);
+            console.error(e);
         }
     }
     protected abstract getTableName(): string;
 
+    async all(): Promise<T[]> {
+        return Promise.resolve(this.data);
+    }
+
+    delete(id: string): Promise<void> {
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i].getId() === id) {
+                this.data.splice(i, 1);
+                break;
+            }
+        }
+        localStorage.setItem(`db_${this.getTableName()}`, JSON.stringify(this.data));;
+        return Promise.resolve();
+    }
+
+    update(model: T): Promise<T> {
+        const attrs = this.modelClass.getAttributes();
+        for (const item of this.data) {
+            if (item.getId() === model.getId()) {
+                for (const attr of attrs) {
+                    item.setAttribute(attr, model.getAttribute(attr));
+                }
+                break;
+            }
+        }
+        localStorage.setItem(`db_${this.getTableName()}`, JSON.stringify(this.data));;
+        return Promise.resolve(model);
+    }
     save(model: T): Promise<T> {
         const saved = this.modelClass.create(model);
         this.data.push(saved);

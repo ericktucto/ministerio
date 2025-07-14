@@ -6,7 +6,7 @@ export default class Revisita extends Model {
     @Attribute
     protected lat: number = 0;
     @Attribute
-    protected log: number = 0;
+    protected lng: number = 0;
 
     setName(name: string) {
         this.name = name;
@@ -20,10 +20,10 @@ export default class Revisita extends Model {
     getLat(): number {
         return this.lat;
     }
-    setLog(log: number) {
-        this.log = log;
+    setLng(lng: number) {
+        this.lng = lng;
     }
-    getLog(): number {
-        return this.log;
+    getLng(): number {
+        return this.lng;
     }
 }
