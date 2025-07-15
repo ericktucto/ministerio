@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import ContentView from './components/organisms/ContentView.vue'
-import ToolBar from './components/organisms/ToolBar.vue'
+import ContentView from '@/components/organisms/ContentView.vue'
+import ToolBar from '@/components/organisms/ToolBar.vue'
 </script>
 <template>
     <div class="h-screen w-screen">
@@ -8,18 +8,3 @@ import ToolBar from './components/organisms/ToolBar.vue'
         <ToolBar />
     </div>
 </template>
-
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>

@@ -1,4 +1,4 @@
-<script setup></script>
+<script setup lang="ts"></script>
 <template>
     <div class="content-view">
         <h3>Content</h3>
