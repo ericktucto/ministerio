@@ -2,11 +2,14 @@
 import { ref, onMounted, computed } from 'vue';
 import { HugeiconsIcon } from '@hugeicons/vue';
 
-const props = defineProps({
-    icon: String,
+const iconNames = ['Location01Icon', 'UserTime03Icon', 'Settings02Icon'] as const;
+type IconName = (typeof iconNames)[number];
+
+const props = defineProps<{
+    icon: IconName,
     label: String,
     active: Boolean,
-});
+}>();
 const classActive = computed(() => {
     if (props.active) {
         return ['bg-blue-500', 'text-white', 'font-bold']
