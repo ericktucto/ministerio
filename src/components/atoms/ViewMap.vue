@@ -2,24 +2,27 @@
 import * as L from 'leaflet';
 import { nextTick, onMounted, ref } from 'vue';
 
+const props = defineProps<{ lat: number; lng: number }>();
+const emit = defineEmits<{
+  touched: [e: L.LeafletMouseEvent, map: L.Map],
+}>();
+
 const mapcontainer = ref<HTMLElement | null>(null);
 const map = ref<L.Map | null>(null);
 const layer = ref('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
-
-const Lat = ref(40.4165);
-const Lng = ref(-3.70256);
 
 async function loadMap() {
     await nextTick();
     if (mapcontainer.value) {
         const m = L.map(mapcontainer.value, {
-            center: [Lat.value, Lng.value],
+            center: [props.lat, props.lng],
             zoom: 19,
         });
         L.tileLayer(layer.value, {
             attribution: '© OpenStreetMap',
             maxZoom: 19,
         }).addTo(m);
+        m.on('click', (e) => emit('touched', e, m));
         map.value = m;
     }
 }
@@ -28,5 +31,7 @@ onMounted(() => {
 });
 </script>
 <template>
-    <div ref="mapcontainer" class="border-red-500"></div>
+    <div>
+        <div ref="mapcontainer" class="h-full w-full"></div>
+    </div>
 </template>
