@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as L from 'leaflet';
-import { nextTick, onMounted, ref, defineExpose } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 
 const props = defineProps<{ lat: number; lng: number }>();
 const emit = defineEmits<{

@@ -7,20 +7,21 @@ import { fileURLToPath, URL } from 'url';
 
 // https://vite.dev/config/
 export default defineConfig({
-    test: {
-        globals: true,
-        environment: 'jsdom',
-    },
-    plugins: [vue(), tailwindcss()],
-    server: {
-        allowedHosts: true,
-    },
-    resolve: {
-        alias: [
-            {
-                find: "@",
-                replacement: fileURLToPath(new URL('./src', import.meta.url)),
-            }
-        ] as AliasOptions,
-    },
+  base: '/ministerio/',
+  test: {
+    globals: true,
+    environment: 'jsdom',
+  },
+  plugins: [vue(), tailwindcss()],
+  server: {
+    allowedHosts: true,
+  },
+  resolve: {
+    alias: [
+      {
+        find: "@",
+        replacement: fileURLToPath(new URL('./src', import.meta.url)),
+      }
+    ] as AliasOptions,
+  },
 }) satisfies UserConfigExport;
