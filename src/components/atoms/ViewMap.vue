@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import * as L from 'leaflet';
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref, defineExpose } from 'vue';
 
 const props = defineProps<{ lat: number; lng: number }>();
 const emit = defineEmits<{
@@ -26,9 +26,22 @@ async function loadMap() {
         map.value = m;
     }
 }
+function setMarks(marks: L.Marker[]) {
+    if (map.value) {
+        map.value.eachLayer((l) => {
+            if (l instanceof L.Marker) {
+                map.value?.removeLayer(l);
+            }
+        });
+        marks.forEach((m) => {
+            m.addTo((map.value as L.Map));
+        });
+    }
+}
 onMounted(() => {
     loadMap();
 });
+defineExpose({ setMarks });
 </script>
 <template>
     <div>

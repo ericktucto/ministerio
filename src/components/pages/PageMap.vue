@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, inject } from 'vue';
+import { nextTick, ref, inject, onMounted } from 'vue';
 import * as L from 'leaflet';
 import MTitle from '@/components/atoms/MTitle.vue';
 import ViewMap from '@/components/atoms/ViewMap.vue';
@@ -14,6 +14,7 @@ if (!injected) {
 const { getModal } = injected;
 
 const addrev = ref<HTMLElement | null>(null);
+const map = ref<InstanceType<typeof ViewMap> | null>(null);
 const popup = ref<L.Popup | null>(null);
 const Lat = ref(40.4165);
 const Lng = ref(-3.70256);
@@ -44,6 +45,27 @@ async function onNewRevisita() {
   const repo = new RevisitaRepository();
   await repo.save(revisita);
 }
+async function loadRevisitas() {
+  const repo = new RevisitaRepository();
+  const revisitas = await repo.all();
+  if (!map.value) {
+    await nextTick();
+    if (!map.value) {
+      throw new Error("No exist map");
+    }
+  }
+  const marks: L.Marker[] = [];
+  revisitas.forEach((revisita) => {
+    const latlng = L.latLng(revisita.getLat(), revisita.getLng());
+    const mark = L.marker(latlng);
+    mark.bindPopup(`<strong>${revisita.getName()}</strong>`);
+    marks.push(mark);
+  });
+  map.value.setMarks(marks);
+}
+onMounted(() => {
+  loadRevisitas();
+});
 </script>
 <template>
   <div class="grid h-full containermap">
@@ -58,6 +80,7 @@ async function onNewRevisita() {
       </div>
     </template>
     <ViewMap
+      ref="map"
       class="h-full"
       @touched="onTouched"
       :lat="Lat"
