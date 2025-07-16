@@ -1,7 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { usePages } from '@/stores/pages';
+import PageMap from '@/components/pages/PageMap.vue';
+const pages = usePages();
+</script>
 <template>
     <div class="content-view">
-        <h3>Content</h3>
+        <PageMap v-if="pages.current == 'map'" />
     </div>
 </template>
 <style>
