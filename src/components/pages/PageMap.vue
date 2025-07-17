@@ -1,82 +1,74 @@
 <script setup lang="ts">
-import { nextTick, ref, inject, onMounted } from 'vue';
+import { nextTick, ref, onMounted } from 'vue';
 import * as L from 'leaflet';
 import MTitle from '@/components/atoms/MTitle.vue';
 import ViewMap from '@/components/atoms/ViewMap.vue';
-import Revisita from '@/models/revisita';
 import RevisitaRepository from '@/repositories/revisita';
-import { modalKey, type ModalError } from '@/modal';
+import NewHereRevisita from '@/components/atoms/NewHereRevisita.vue';
+import type Revisita from '@/models/revisita';
+import { revisitaToMarker } from '@/adapters';
+import { HugeiconsIcon } from '@hugeicons/vue';
+import { User03Icon } from '@hugeicons/core-free-icons';
 
-const injected = inject(modalKey);
-if (!injected) {
-    throw new Error('Error inject modal');
-}
-const { getModal } = injected;
-
+// dom references
 const addrev = ref<HTMLElement | null>(null);
+const info = ref<HTMLElement | null>(null);
 const map = ref<InstanceType<typeof ViewMap> | null>(null);
-const popup = ref<L.Popup | null>(null);
+
+// objects leaflet
+const popup = L.popup();
+
+// refs
 const Lat = ref(40.4165);
 const Lng = ref(-3.70256);
-let _map: L.Map | null = null;
+const currentRevisita = ref<Revisita | null>(null);
 
 function onTouched(e: L.LeafletMouseEvent, map: L.Map) {
-  if (addrev.value === null) {
-    return;
-  }
-  popup.value = L.popup()
-    .setLatLng([e.latlng.lat, e.latlng.lng])
-    .setContent(addrev.value)
-    .openOn(map);
-  _map = map;
+  popup
+    ?.setLatLng(e.latlng)
+    ?.openOn(map);
   Lat.value = e.latlng.lat;
   Lng.value = e.latlng.lng;
-}
-async function onNewRevisita() {
-  const revisita = await getModal<Revisita | ModalError>('newrevisita');
-  if (_map && popup.value) {
-    _map.closePopup((popup.value as L.Popup))
-  }
-  if ('error' in revisita) {
-    return;
-  }
-  revisita.setLat(Lat.value);
-  revisita.setLng(Lng.value);
-  const repo = new RevisitaRepository();
-  await repo.save(revisita);
 }
 async function loadRevisitas() {
   const repo = new RevisitaRepository();
   const revisitas = await repo.all();
-  if (!map.value) {
-    await nextTick();
-    if (!map.value) {
-      throw new Error("No exist map");
-    }
-  }
-  const marks: L.Marker[] = [];
-  revisitas.forEach((revisita) => {
-    const latlng = L.latLng(revisita.getLat(), revisita.getLng());
-    const mark = L.marker(latlng);
-    mark.bindPopup(`<strong>${revisita.getName()}</strong>`);
-    marks.push(mark);
-  });
-  map.value.setMarks(marks);
+  map.value?.setMarkers(
+    revisitas.map((revisita) => {
+      const mark = revisitaToMarker(revisita)
+      mark.on('click', () => onClickMarker(revisita));
+      return mark;
+    })
+  );
+}
+function onClickMarker(revisita: Revisita) {
+  currentRevisita.value = revisita;
+}
+function onNewRevisita(revisita: Revisita) {
+  popup?.close();
+  map.value?.addMarker(
+    revisitaToMarker(revisita)
+  );
+}
+async function boot() {
+  await nextTick();
+  popup.setContent((addrev.value as HTMLElement));
+  loadRevisitas();
 }
 onMounted(() => {
-  loadRevisitas();
+  boot();
 });
 </script>
 <template>
-  <div class="grid h-full containermap">
+  <div class="grid h-full containermap relative">
     <MTitle class="p-4">Mapa</MTitle>
     <template>
       <div ref="addrev" class="flex py-3">
-        <!-- Pasarlo a un componente -->
-        <button
-          class="p-2 rounded bg-blue-500 text-white"
-          @click="onNewRevisita"
-        >Agregar revisita</button>
+        <NewHereRevisita
+          :lat="Lat"
+          :lng="Lng"
+          @newRevisita="onNewRevisita"
+        />
       </div>
     </template>
     <ViewMap
@@ -86,6 +78,29 @@ onMounted(() => {
       :lat="Lat"
       :lng="Lng"
     />
+    <div
+      ref="info"
+      v-show="currentRevisita"
+      class="absolute w-full bottom-6 z-2000 bg-transparent px-4"
+    >
+      <div class="flex gap-2 p-4 bg-white rounded-xl">
+        <div
+          class="w-12 h-12 rounded-full bg-blue-500 flex justify-center items-center text-white"
+        >
+          <HugeiconsIcon
+            :icon="User03Icon"
+            :size="24"
+            :strokeWidth="1.5"
+          />
+        </div>
+        <div>
+          <MTitle>{{ currentRevisita?.getName() }}</MTitle>
+          <button
+            class="py-2 px-4 rounded bg-red-500 text-white"
+          >Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <style>

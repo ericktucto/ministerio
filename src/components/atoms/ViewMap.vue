@@ -26,22 +26,35 @@ async function loadMap() {
         map.value = m;
     }
 }
-function setMarks(marks: L.Marker[]) {
-    if (map.value) {
-        map.value.eachLayer((l) => {
-            if (l instanceof L.Marker) {
-                map.value?.removeLayer(l);
-            }
-        });
-        marks.forEach((m) => {
-            m.addTo((map.value as L.Map));
-        });
+function setMarkers(markers: L.Marker[]) {
+    if (!map.value) {
+      return;
     }
+    map.value.eachLayer((l) => {
+        if (l instanceof L.Marker) {
+            map.value?.removeLayer(l);
+        }
+    });
+    markers.forEach((m) => {
+        m.addTo((map.value as L.Map));
+    });
+}
+function addMarker(marker: L.Marker) {
+  if (!map.value) {
+    return;
+  }
+  marker.addTo((map.value as L.Map));
+}
+function closePopup(popup: L.Popup) {
+  if(!map.value) {
+    return;
+  }
+  map.value.closePopup(popup);
 }
 onMounted(() => {
     loadMap();
 });
-defineExpose({ setMarks });
+defineExpose({ setMarkers, addMarker, closePopup });
 </script>
 <template>
     <div>
