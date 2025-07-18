@@ -17,6 +17,7 @@ async function loadMap() {
         const m = L.map(mapcontainer.value, {
             center: [props.lat, props.lng],
             zoom: 19,
+            zoomControl: false,
         });
         L.tileLayer(layer.value, {
             attribution: '© OpenStreetMap',

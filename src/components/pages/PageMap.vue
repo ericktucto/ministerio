@@ -1,14 +1,12 @@
 <script setup lang="ts">
 import { nextTick, ref, onMounted } from 'vue';
 import * as L from 'leaflet';
-import MTitle from '@/components/atoms/MTitle.vue';
 import ViewMap from '@/components/atoms/ViewMap.vue';
 import RevisitaRepository from '@/repositories/revisita';
 import NewHereRevisita from '@/components/atoms/NewHereRevisita.vue';
 import type Revisita from '@/models/revisita';
 import { revisitaToMarker } from '@/adapters';
-import { HugeiconsIcon } from '@hugeicons/vue';
-import { User03Icon } from '@hugeicons/core-free-icons';
+import CardInfo from '@/components/organisms/CardInfo.vue';
 
 // dom references
 const addrev = ref<HTMLElement | null>(null);
@@ -61,7 +59,6 @@ onMounted(() => {
 </script>
 <template>
   <div class="grid h-full containermap relative">
-    <MTitle class="p-4">Mapa</MTitle>
     <template>
       <div ref="addrev" class="flex py-3">
         <NewHereRevisita
@@ -78,33 +75,10 @@ onMounted(() => {
       :lat="Lat"
       :lng="Lng"
     />
-    <div
-      ref="info"
-      v-show="currentRevisita"
-      class="absolute w-full bottom-6 z-2000 bg-transparent px-4"
-    >
-      <div class="flex gap-2 p-4 bg-white rounded-xl">
-        <div
-          class="w-12 h-12 rounded-full bg-blue-500 flex justify-center items-center text-white"
-        >
-          <HugeiconsIcon
-            :icon="User03Icon"
-            :size="24"
-            :strokeWidth="1.5"
-          />
-        </div>
-        <div>
-          <MTitle>{{ currentRevisita?.getName() }}</MTitle>
-          <button
-            class="py-2 px-4 rounded bg-red-500 text-white"
-          >Eliminar</button>
-        </div>
-      </div>
-    </div>
+    <CardInfo
+      :revisita="(currentRevisita as Revisita)"
+    />
   </div>
 </template>
 <style>
-.containermap {
-    grid-template-rows: 3.75rem 1fr;
-}
 </style>
