@@ -20,7 +20,7 @@ function onClick() {
 }
 </script>
 <template>
-  <MTitle align="center">New Revisita</MTitle>
+  <MTitle align="center">Nueva Revisita</MTitle>
   <MInput v-model="name" class="w-full mb-4" label="Nombre completo" />
   <button
       type="button"

@@ -6,6 +6,9 @@ import MTitle from '@/components/atoms/MTitle.vue';
 import MBadge from '@/components/atoms/MBadge.vue';
 
 defineProps<{revisita: Revisita|null}>()
+const emit = defineEmits<{
+  trash: [],
+}>();
 function onShowMap() {
   if (
     document.activeElement
@@ -13,6 +16,9 @@ function onShowMap() {
   ) {
     document.activeElement.blur();
   }
+}
+function onDelete() {
+  emit('trash');
 }
 </script>
 <template>
@@ -79,6 +85,7 @@ function onShowMap() {
       <div class="autohide">
         <button
           class="flex-1 py-2 px-4 rounded-bl-xl bg-red-500 text-white"
+          @click="onDelete"
         >Eliminar</button>
         <button
           class="flex-1 py-2 px-4 rounded-br-xl bg-blue-500 text-white"

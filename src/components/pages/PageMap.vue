@@ -10,7 +10,6 @@ import CardInfo from '@/components/organisms/CardInfo.vue';
 
 // dom references
 const addrev = ref<HTMLElement | null>(null);
-const info = ref<HTMLElement | null>(null);
 const map = ref<InstanceType<typeof ViewMap> | null>(null);
 
 // objects leaflet
@@ -42,11 +41,21 @@ async function loadRevisitas() {
 function onClickMarker(revisita: Revisita) {
   currentRevisita.value = revisita;
 }
-function onNewRevisita(revisita: Revisita) {
+async function onNewRevisita(revisita: Revisita) {
   popup?.close();
   map.value?.addMarker(
     revisitaToMarker(revisita)
   );
+  await loadRevisitas();
+}
+async function onDeleteRevisita() {
+  const repo = new RevisitaRepository();
+  const response = confirm('¿Borrar revisita?');
+  if (response) {
+    await repo.delete((currentRevisita.value?.getId() as string));
+    currentRevisita.value = null;
+    await loadRevisitas();
+  }
 }
 async function boot() {
   await nextTick();
@@ -77,6 +86,7 @@ onMounted(() => {
     />
     <CardInfo
       :revisita="(currentRevisita as Revisita)"
+      @trash="onDeleteRevisita"
     />
   </div>
 </template>
