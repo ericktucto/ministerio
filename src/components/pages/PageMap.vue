@@ -81,6 +81,7 @@ onMounted(() => {
       ref="map"
       class="h-full"
       @touched="onTouched"
+      gps
       :lat="Lat"
       :lng="Lng"
     />
