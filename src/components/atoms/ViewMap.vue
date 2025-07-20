@@ -96,10 +96,17 @@ function closePopup(popup: L.Popup) {
 function goToCoords(latlng: L.LatLng) {
   map.value?.setView(latlng);
 }
+function goToMyLocation() {
+  const latlng = circle.value?.getLatLng()
+  if (!latlng) {
+    return;
+  }
+  goToCoords(latlng);
+}
 onMounted(() => {
     loadMap();
 });
-defineExpose({ goToCoords, setMarkers, addMarker, closePopup });
+defineExpose({ goToMyLocation, goToCoords, setMarkers, addMarker, closePopup });
 </script>
 <template>
     <div>

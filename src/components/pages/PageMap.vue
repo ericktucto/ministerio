@@ -7,6 +7,7 @@ import NewHereRevisita from '@/components/atoms/NewHereRevisita.vue';
 import type Revisita from '@/models/revisita';
 import { revisitaToMarker } from '@/adapters';
 import CardInfo from '@/components/organisms/CardInfo.vue';
+import TopActionMap from '@/components/organisms/TopActionMap.vue';
 
 // dom references
 const addrev = ref<HTMLElement | null>(null);
@@ -60,7 +61,7 @@ async function onDeleteRevisita() {
 async function boot() {
   await nextTick();
   popup.setContent((addrev.value as HTMLElement));
-  loadRevisitas();
+  await loadRevisitas();
 }
 onMounted(() => {
   boot();
@@ -84,6 +85,9 @@ onMounted(() => {
       gps
       :lat="Lat"
       :lng="Lng"
+    />
+    <TopActionMap
+      @myLocation="() => map?.goToMyLocation()"
     />
     <CardInfo
       :revisita="(currentRevisita as Revisita)"
