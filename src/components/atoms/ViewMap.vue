@@ -23,25 +23,26 @@ function gps(callback: PositionCallback): Promise<GeolocationPosition> {
       callback(position);
       resolve(position);
     }, reject, {
-      timeout: 5000,
+      enableHighAccuracy: true,
+      maximumAge: 0,
+      timeout: 2000,
     });
   })
 }
 const circle = ref<L.Circle | null>(null);
 function loopToGPS(position: GeolocationPosition) {
-  if (!map.value) {
+  if (!map.value || position.coords.accuracy > 50) {
     return;
   }
   const latlng = L.latLng(position.coords.latitude, position.coords.longitude);
-  map.value.setView(latlng);
   if (circle.value) {
     circle.value.setLatLng(latlng)
     return;
   }
+  map.value.setView(latlng);
   circle.value = L.circle([position.coords.latitude, position.coords.longitude], {
-    color: 'red',
-    radius: 5,
-    fillColor: '#f03',
+    radius: 2,
+    className: 'bg-blue-500',
     fillOpacity: 0.5
   }).addTo((map.value as L.Map));
 }
