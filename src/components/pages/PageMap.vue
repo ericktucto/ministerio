@@ -58,7 +58,17 @@ async function onDeleteRevisita() {
     await loadRevisitas();
   }
 }
-async function onShowTo(data: { id: string }) {
+async function onShowTo(data: {
+  id?: string,
+  lat?: number,
+  lng?: number,
+  type: "revisita" | "direccion",
+}) {
+  if (data.type === 'direccion' && data.lat && data.lng) {
+    const latlng = L.latLng(data.lat, data.lng);
+    map.value?.goToCoords(latlng);
+    return;
+  }
   const repo = new RevisitaRepository();
   const revisitas = await repo.all()
   const rev = revisitas.find((revisita) => revisita.getId() === data.id);
