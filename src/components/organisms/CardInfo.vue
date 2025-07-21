@@ -56,7 +56,7 @@ function onDelete() {
           <MTitle size="base">{{ revisita?.getName() }}</MTitle>
           <small
             class="text-gray-500 flex items-center justify-between"
-          ><span class="text-xs">{{
+          ><span class="address text-xs max-w-[12rem]">{{
               revisita?.getAddress()
           }}</span><span
               class="autohide"
@@ -102,6 +102,12 @@ function onDelete() {
 }
 div[tabindex="0"] .autohide {
   display: none;
+}
+
+div[tabindex="0"]:not(:focus-within) .address {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 div[tabindex="0"]:focus-within {
   .autohide {

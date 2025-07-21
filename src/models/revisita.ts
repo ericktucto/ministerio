@@ -34,14 +34,12 @@ export default class Revisita extends Model {
     this.description = description;
   }
   getDescription(): string {
-    return "Los precios son comodos y hay lindos zapatos";
-    //return this.description;
+    return this.description;
   }
   setAddress(address: string) {
     this.address = address;
   }
   getAddress(): string {
-    return '1234 Main Street, New York, NY 10001';
-    //return this.address;
+    return this.address;
   }
 }

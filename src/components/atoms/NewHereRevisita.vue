@@ -18,7 +18,7 @@ const emit = defineEmits<{
   newRevisita: [revisita: Revisita],
 }>();
 async function onNewRevisita(lat: number, lng: number) {
-  const revisita = await getModal<Revisita | ModalError>('newrevisita');
+  const revisita = await getModal<Revisita | ModalError>('newrevisita', { lat, lng });
   if ('error' in revisita) {
     return;
   }

@@ -4,7 +4,7 @@ import ContentView from '@/components/organisms/ContentView.vue'
 import ToolBar from '@/components/organisms/ToolBar.vue'
 import ModalResponse from '@/components/organisms/ModalResponse.vue'
 import NewRevisita from '@/components/organisms/NewRevisita.vue';
-import { modalKey } from './modal';
+import { modalKey, type DataModalType } from './modal';
 
 let _resolve: ((data: any) => void) | null = null;
 const _idModal = ref('')
@@ -12,7 +12,12 @@ const active = ref(false);
 provide(modalKey, {
     resolveModal,
     getModal,
+    getData,
 });
+const dataModal = ref<DataModalType>({});
+function getData<T = any>(modal: string): T {
+  return dataModal.value[modal] || null;
+}
 function resolveModal<T = any>(data: T) {
   active.value = false;
   _resolve?.(data);
@@ -23,10 +28,11 @@ function onCloseModal() {
   _resolve = null;
   active.value = false;
 }
-function getModal<T = any>(modal: string): Promise<T> {
+function getModal<T = any>(modal: string, data: any): Promise<T> {
   return new Promise<T>((resolve) => {
     active.value = true;
     _idModal.value = modal;
+    dataModal.value[modal] = data;
     _resolve = resolve;
   });
 }
