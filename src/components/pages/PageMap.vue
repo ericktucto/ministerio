@@ -58,6 +58,16 @@ async function onDeleteRevisita() {
     await loadRevisitas();
   }
 }
+async function onShowTo(data: { id: string }) {
+  const repo = new RevisitaRepository();
+  const revisitas = await repo.all()
+  const rev = revisitas.find((revisita) => revisita.getId() === data.id);
+  if (rev) {
+    currentRevisita.value = rev;
+    const latlng = L.latLng(rev.getLat(), rev.getLng());
+    map.value?.goToCoords(latlng);
+  }
+}
 async function boot() {
   await nextTick();
   popup.setContent((addrev.value as HTMLElement));
@@ -88,6 +98,7 @@ onMounted(() => {
     />
     <TopActionMap
       @myLocation="() => map?.goToMyLocation()"
+      @showto="onShowTo"
     />
     <CardInfo
       :revisita="(currentRevisita as Revisita)"
