@@ -7,6 +7,7 @@ import MBadge from '@/components/atoms/MBadge.vue';
 import * as nominatim from '@/services/nominatim';
 const emit = defineEmits<{
   myLocation: [],
+  focusinput: [],
   showto: [data: DataShowTo],
 }>();
 interface TypeResult {
@@ -85,6 +86,10 @@ async function onClickSearch() {
     loading.value.nominatim = false;
   }
 }
+function onFocusInputSearch() {
+  emit('focusinput')
+  _search("");
+}
 onMounted(() => {
   _search("");
 });
@@ -98,6 +103,7 @@ onMounted(() => {
         type="text"
         class="flex-1 rounded-full bg-white h-12 px-4 py-2 shadow-md focus:outline-none"
         placeholder="Buscar revisita o lugar..."
+        @focus="onFocusInputSearch"
         @input="onSearch"
       />
       <button
@@ -145,7 +151,7 @@ onMounted(() => {
           <strong>{{ r.text }}</strong>
           <MBadge class="text-xs" text="Ubicar" icon="Location01Icon" />
         </span>
-        <p class="max-h-6 text-s text-gray-500">{{ r.details }}</p>
+        <p class="max-h-6 text-s text-gray-500 max-w-[300px] overflow-hidden text-nowrap text-ellipsis">{{ r.details }}</p>
       </div>
     </div>
   </div>
@@ -153,5 +159,7 @@ onMounted(() => {
 <style scoped>
 .absolute:focus-within .resultsearch.hidden {
   display: grid;
+  max-height: 20rem;
+  overflow-y: scroll;
 }
 </style>

@@ -22,6 +22,7 @@ const Lng = ref(-3.70256);
 const currentRevisita = ref<Revisita | null>(null);
 
 function onTouched(e: L.LeafletMouseEvent, map: L.Map) {
+  currentRevisita.value = null;
   popup
     ?.setLatLng(e.latlng)
     ?.openOn(map);
@@ -109,6 +110,7 @@ onMounted(() => {
     <TopActionMap
       @myLocation="() => map?.goToMyLocation()"
       @showto="onShowTo"
+      @focusinput="() => currentRevisita = null"
     />
     <CardInfo
       :revisita="(currentRevisita as Revisita)"
