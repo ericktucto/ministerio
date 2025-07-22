@@ -81,7 +81,6 @@ async function onShowTo(data: {
 async function boot() {
   await nextTick();
   popup.setContent((addrev.value as HTMLElement));
-  await loadRevisitas();
 }
 onMounted(() => {
   boot();
@@ -102,6 +101,7 @@ onMounted(() => {
       ref="map"
       class="h-full"
       @touched="onTouched"
+      @initialized="() => loadRevisitas()"
       gps
       :lat="Lat"
       :lng="Lng"

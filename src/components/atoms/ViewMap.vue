@@ -8,6 +8,7 @@ const props = withDefaults(
 );
 const emit = defineEmits<{
   touched: [e: L.LeafletMouseEvent, map: L.Map],
+  initialized: [map: L.Map],
 }>();
 
 const mapcontainer = ref<HTMLElement | null>(null);
@@ -66,6 +67,7 @@ async function loadMap() {
         }).addTo(m);
         m.on('click', (e) => emit('touched', e, m));
         map.value = m;
+        emit('initialized', m);
     }
 }
 function setMarkers(markers: L.Marker[]) {
