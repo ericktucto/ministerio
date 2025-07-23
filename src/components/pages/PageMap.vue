@@ -14,20 +14,16 @@ const addrev = ref<HTMLElement | null>(null);
 const map = ref<InstanceType<typeof ViewMap> | null>(null);
 
 // objects leaflet
-const popup = L.popup();
+const popup = ref(L.popup());
 
 // refs
-const Lat = ref(40.4165);
-const Lng = ref(-3.70256);
 const currentRevisita = ref<Revisita | null>(null);
 
 function onTouched(e: L.LeafletMouseEvent, map: L.Map) {
   currentRevisita.value = null;
-  popup
+  popup.value
     ?.setLatLng(e.latlng)
     ?.openOn(map);
-  Lat.value = e.latlng.lat;
-  Lng.value = e.latlng.lng;
 }
 async function loadRevisitas() {
   const repo = new RevisitaRepository();
@@ -44,7 +40,7 @@ function onClickMarker(revisita: Revisita) {
   currentRevisita.value = revisita;
 }
 async function onNewRevisita(revisita: Revisita) {
-  popup?.close();
+  popup.value?.close();
   map.value?.addMarker(
     revisitaToMarker(revisita)
   );
@@ -81,7 +77,7 @@ async function onShowTo(data: {
 }
 async function boot() {
   await nextTick();
-  popup.setContent((addrev.value as HTMLElement));
+  popup.value?.setContent((addrev.value as HTMLElement));
 }
 onMounted(() => {
   boot();
@@ -92,8 +88,7 @@ onMounted(() => {
     <template>
       <div ref="addrev" class="flex py-3">
         <NewHereRevisita
-          :lat="Lat"
-          :lng="Lng"
+          :popup="(popup as L.Popup)"
           @newRevisita="onNewRevisita"
         />
       </div>
@@ -104,8 +99,8 @@ onMounted(() => {
       @touched="onTouched"
       @initialized="() => loadRevisitas()"
       gps
-      :lat="Lat"
-      :lng="Lng"
+      :lat="40.4165"
+      :lng="-3.70256"
     />
     <TopActionMap
       @myLocation="() => map?.goToMyLocation()"
