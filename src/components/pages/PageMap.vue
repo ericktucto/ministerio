@@ -67,7 +67,7 @@ async function onShowTo(data: {
 }) {
   if (data.type === 'direccion' && data.lat && data.lng) {
     const latlng = L.latLng(data.lat, data.lng);
-    map.value?.goToCoords(latlng);
+    map.value?.goToCoords(latlng, 19);
     return;
   }
   const repo = new RevisitaRepository();
@@ -76,7 +76,7 @@ async function onShowTo(data: {
   if (rev) {
     currentRevisita.value = rev;
     const latlng = L.latLng(rev.getLat(), rev.getLng());
-    map.value?.goToCoords(latlng);
+    map.value?.goToCoords(latlng, 19);
   }
 }
 async function boot() {

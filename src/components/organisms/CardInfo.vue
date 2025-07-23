@@ -25,12 +25,11 @@ function onDelete() {
   <div
     ref="info"
     v-show="revisita"
-    class="absolute bottom-0 w-full z-1000 bg-transparent px-4 pb-4 flex items-end
-      "
+    class="absolute bottom-0 w-full z-1000 bg-transparent px-4 pb-4 flex items-end"
   >
     <div
       tabindex="0"
-      class="flex flex-1 bg-white rounded-xl
+      class="flex flex-1 bg-white rounded-xl shadow-md
         transition-all duration-300 ease-in-out
         focus:flex-col
         focus:h-[30rem]

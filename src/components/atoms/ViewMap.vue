@@ -95,15 +95,15 @@ function closePopup(popup: L.Popup) {
   }
   map.value.closePopup(popup);
 }
-function goToCoords(latlng: L.LatLng) {
-  map.value?.setView(latlng);
+function goToCoords(latlng: L.LatLng, zoom?: number) {
+  map.value?.setView(latlng, zoom);
 }
 function goToMyLocation() {
   const latlng = circle.value?.getLatLng()
   if (!latlng) {
     return;
   }
-  goToCoords(latlng);
+  goToCoords(latlng, 19);
 }
 onMounted(() => {
     loadMap();
