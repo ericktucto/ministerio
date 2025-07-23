@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { HugeiconsIcon } from '@hugeicons/vue';
-import { Gps01Icon, Search01Icon, Settings02Icon } from '@hugeicons/core-free-icons';
+import { ArrowLeft02Icon, Gps01Icon, Location01Icon, Search01Icon } from '@hugeicons/core-free-icons';
 import RevisitaRepository from '@/repositories/revisita';
-import MBadge from '@/components/atoms/MBadge.vue';
 import * as nominatim from '@/services/nominatim';
+import ResultRevisita from '@/components/molecules/ResultRevisita.vue';
+import ResultDirection from '../molecules/ResultDirection.vue';
 const emit = defineEmits<{
   myLocation: [],
   focusinput: [],
@@ -88,78 +89,105 @@ async function onClickSearch() {
 }
 function onFocusInputSearch() {
   emit('focusinput')
-  _search("");
+  _search(search.value);
+}
+function onMyLocation() {
+  emit('myLocation');
+  blurComponent();
+}
+function onBack(e: Event) {
+  const btn = (e.target as HTMLButtonElement);
+  btn.blur();
+  blurComponent();
+}
+function blurComponent() {
+  searchinput.value?.focus();
+  searchinput.value?.blur();
 }
 onMounted(() => {
   _search("");
 });
 </script>
 <template>
-  <div class="absolute top-0 z-1000 w-full h-[4rem] p-2">
+  <div class="absolute top-0 z-1000 w-full max-h-[100dvh]
+      focus-within:h-dvh
+      focus-within:bg-white
+    "
+  >
     <div class="flex gap-2">
-      <input
-        ref="searchinput"
-        v-model="search"
-        type="text"
-        class="flex-1 rounded-full bg-white h-12 px-4 py-2 shadow-md focus:outline-none"
-        placeholder="Buscar revisita o lugar..."
-        @focus="onFocusInputSearch"
-        @input="onSearch"
-      />
+      <div class="flex-row-reverse flex-1 gap-1 flex rounded-full bg-white h-12 p-2 shadow-md focus:outline-none">
+        <input
+          ref="searchinput"
+          v-model="search"
+          type="text"
+          class="peer flex-1 bg-white focus:outline-none"
+          placeholder="Buscar revisita o lugar..."
+          @focus="onFocusInputSearch"
+          @input="onSearch"
+        />
+        <button
+          type="button"
+          class="bg-white p-1 w-8 h-8 place-items-center peer-focus-within:hidden"
+          @click="() => searchinput?.focus()"
+        ><HugeiconsIcon
+          :icon="Location01Icon"
+        /></button>
+        <button
+          type="button"
+          class="hidden bg-white p-1 w-8 h-8 place-items-center peer-focus-within:grid"
+          @click="onBack"
+          @focus="onBack"
+        ><HugeiconsIcon
+          :icon="ArrowLeft02Icon"
+        /></button>
+      </div>
       <button
         type="button"
         class="p-2 rounded-full bg-white w-12 h-12 grid place-items-center shadow-md"
       ><HugeiconsIcon
         class="w-6 h-6"
         :icon="Gps01Icon"
-        @click="$emit('myLocation')"
+        @click="onMyLocation"
       /></button>
-      <button
-        type="button"
-        class="p-2 rounded-full bg-white w-12 h-12 grid place-items-center shadow-md"
-      ><HugeiconsIcon class="w-6 h-6" :icon="Settings02Icon" /></button>
     </div>
-    <div class="resultsearch hidden gap-2 mt-2">
-      <div
+    <div class="resultsearch hidden mt-2">
+      <ResultDirection
         v-for="(d, index) in directions"
         :key="`direction-${index}`"
-        class="inline-flex w-full gap-2 items-center p-4 bg-white shadow-md rounded-xl"
-        @focus="(e) => onClickDirection(e, d)"
-        tabindex="0"
-      >
-        <span class="flex items-center justify-between gap-2">
-          <span>{{ d.display_name }}</span>
-          <MBadge class="text-xs" text="Ubicar" icon="Location01Icon" />
-        </span>
-      </div>
+        :text="d.display_name"
+        @focus="(e: Event) => onClickDirection(e, d)"
+        class="border-gray-200 border-t"
+        :class="{
+          'border-y': index === directions.length - 1 && resultInput.length === 0,
+        }"
+      />
       <button
         v-show="directions.length === 0"
         type="button"
-        class="italic inline-flex w-full gap-2 items-center p-4 bg-white shadow-md rounded-xl"
+        class="italic inline-flex w-full gap-2 items-center p-4 bg-white border-gray-200 border-t"
+        :class="{ 'border-b': resultInput.length === 0 }"
         @focus="onClickSearch"
       ><HugeiconsIcon
         class="w-6 h-6"
           :icon="Search01Icon"
         />{{ loading.nominatim ? 'Buscando...' : 'Buscar dirección' }}</button>
-      <div
-        v-for="r in resultInput"
-        class="p-4 bg-white shadow-md rounded-xl"
-        @focus="(e) => onClickResult(e, r)"
-        tabindex="0"
-      >
-        <span class="flex items-center justify-between gap-2">
-          <strong>{{ r.text }}</strong>
-          <MBadge class="text-xs" text="Ubicar" icon="Location01Icon" />
-        </span>
-        <p class="max-h-6 text-s text-gray-500 max-w-[300px] overflow-hidden text-nowrap text-ellipsis">{{ r.details }}</p>
-      </div>
+      <ResultRevisita
+        v-for="(r, index) in resultInput"
+        :key="`result-${r.id}`"
+        :text="r.text"
+        :details="r.details"
+        @focused="(e) => onClickResult(e, r)"
+        class="border-gray-200 border-t"
+        :class="{
+          'border-y': index === resultInput.length - 1,
+        }"
+      />
     </div>
   </div>
 </template>
 <style scoped>
 .absolute:focus-within .resultsearch.hidden {
   display: grid;
-  max-height: 20rem;
   overflow-y: scroll;
 }
 </style>
