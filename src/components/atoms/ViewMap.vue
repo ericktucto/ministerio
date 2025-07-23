@@ -41,7 +41,7 @@ function loopToGPS(position: GeolocationPosition) {
     return;
   }
   map.value.setView(latlng);
-  circle.value = L.circle([position.coords.latitude, position.coords.longitude], {
+  circle.value = L.circle(latlng, {
     radius: 2,
     className: 'bg-blue-500',
     fillOpacity: 0.5
