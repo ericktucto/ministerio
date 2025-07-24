@@ -13,6 +13,7 @@
     "@hugeicons/core-free-icons": "^1.0.14",
     "@hugeicons/vue": "^1.0.3",
     "@tailwindcss/vite": "^4.1.11",
+    "@vuepic/vue-datepicker": "^11.0.2",
     "leaflet": "^1.9.4",
     "pinia": "^3.0.3",
     "reflect-metadata": "^0.2.2",

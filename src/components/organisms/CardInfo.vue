@@ -1,11 +1,18 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { format } from 'date-fns/format'
+import { es } from 'date-fns/locale'
 import { HugeiconsIcon } from '@hugeicons/vue';
 import { User03Icon, Clock01Icon } from '@hugeicons/core-free-icons';
 import type Revisita from '@/models/revisita';
 import MTitle from '@/components/atoms/MTitle.vue';
 import MBadge from '@/components/atoms/MBadge.vue';
+import type Cita from '@/models/cita';
 
-defineProps<{revisita: Revisita|null}>()
+const props = defineProps<{
+  revisita: Revisita|null
+  lastCita: Cita|null
+}>()
 const emit = defineEmits<{
   trash: [],
 }>();
@@ -20,6 +27,16 @@ function onShowMap() {
 function onDelete() {
   emit('trash');
 }
+const formattedNexDate = computed(() => {
+  if (!props.lastCita) {
+    return '---';
+  }
+  return format(
+    props.lastCita.getNextDateObj(),
+    "iiii i 'de' LLLL 'del' yyyy h:m a",
+    { locale: es }
+  );
+});
 </script>
 <template>
   <div
@@ -72,7 +89,7 @@ function onDelete() {
               :icon="Clock01Icon"
               :size="16"
               :strokeWidth="1.5"
-            /><span>Domingo 12 de Agosto, 09:00 AM</span>
+            /><span>{{ formattedNexDate }}</span>
           </span>
         </div>
         <div class="autohide mt-4">

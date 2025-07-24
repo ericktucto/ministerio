@@ -8,6 +8,8 @@ import type Revisita from '@/models/revisita';
 import { revisitaToMarker } from '@/adapters';
 import CardInfo from '@/components/organisms/CardInfo.vue';
 import TopActionMap from '@/components/organisms/TopActionMap.vue';
+import type Cita from '@/models/cita';
+import CitaRepository from '@/repositories/cita';
 
 // dom references
 const addrev = ref<HTMLElement | null>(null);
@@ -18,9 +20,10 @@ const popup = ref(L.popup());
 
 // refs
 const currentRevisita = ref<Revisita | null>(null);
+const currentCita = ref<Cita | null>(null);
 
 function onTouched(e: L.LeafletMouseEvent, map: L.Map) {
-  currentRevisita.value = null;
+  setCurrentRevisita(null);
   popup.value
     ?.setLatLng(e.latlng)
     ?.openOn(map);
@@ -36,8 +39,27 @@ async function loadRevisitas() {
     })
   );
 }
-function onClickMarker(revisita: Revisita) {
+async function lastCita(revisita: Revisita): Promise<Cita|null> {
+  const repo = new CitaRepository();
+  const result = await repo.all()
+  const citas = result
+    .filter((cita) => cita.getRevisitaId() == revisita.getId())
+    .sort(
+      (citaA, citaB) => citaA.getDateObj().getTime() - citaB.getDateObj().getTime()
+    );
+  return citas.length > 0 ? citas[0] : null;
+}
+async function setCurrentRevisita(revisita: Revisita|null) {
+  if (revisita === null) {
+    currentRevisita.value = null;
+    currentCita.value = null;
+    return;
+  }
   currentRevisita.value = revisita;
+  currentCita.value = await lastCita(revisita);
+}
+async function onClickMarker(revisita: Revisita) {
+  await setCurrentRevisita(revisita);
 }
 async function onNewRevisita(revisita: Revisita) {
   popup.value?.close();
@@ -49,9 +71,21 @@ async function onNewRevisita(revisita: Revisita) {
 async function onDeleteRevisita() {
   const repo = new RevisitaRepository();
   const response = confirm('¿Borrar revisita?');
-  if (response) {
-    await repo.delete((currentRevisita.value?.getId() as string));
-    currentRevisita.value = null;
+  if (response && currentRevisita.value) {
+    // delete revisita
+    const id = currentRevisita.value.getId();
+    await repo.delete(id);
+
+    // delete cita
+    const repoCita = new CitaRepository();
+    const result = await repoCita.all()
+    result
+      .filter((cita) => cita.getRevisitaId() == id)
+      .forEach(async (cita) => {
+        await repoCita.delete(cita.getId());
+      });
+
+    setCurrentRevisita(null);
     await loadRevisitas();
   }
 }
@@ -70,7 +104,7 @@ async function onShowTo(data: {
   const revisitas = await repo.all()
   const rev = revisitas.find((revisita) => revisita.getId() === data.id);
   if (rev) {
-    currentRevisita.value = rev;
+    setCurrentRevisita(rev);
     const latlng = L.latLng(rev.getLat(), rev.getLng());
     map.value?.goToCoords(latlng, 19);
   }
@@ -105,10 +139,11 @@ onMounted(() => {
     <TopActionMap
       @myLocation="() => map?.goToMyLocation()"
       @showto="onShowTo"
-      @focusinput="() => currentRevisita = null"
+      @focusinput="setCurrentRevisita(null)"
     />
     <CardInfo
       :revisita="(currentRevisita as Revisita)"
+      :lastCita="(currentCita as Cita)"
       @trash="onDeleteRevisita"
     />
   </div>
