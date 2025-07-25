@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { inject, ref } from 'vue';
-import { es } from 'date-fns/locale'
-import VueDatePicker from '@vuepic/vue-datepicker';
+import { inject, ref, onMounted } from 'vue';
 import { modalKey } from '@/modal';
 import * as nominatim from '@/services/nominatim';
 import MTitle from '@/components/atoms/MTitle.vue';
 import MInput from '@/components/atoms/MInput.vue';
 import MTextarea from '@/components/atoms/MTextarea.vue';
+import MInputDate from '@/components/molecules/MInputDate.vue';
+import MInputClock from '@/components/molecules/MInputClock.vue';
 import Revisita from '@/models/revisita';
 import Cita from '@/models/cita';
 
@@ -15,6 +15,12 @@ if (!injected) {
     throw new Error('Error inject modal');
 }
 const { resolveModal, getData } = injected;
+onMounted(() => {
+  const now = new Date();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  time.value = `${hour}:${minute < 10 ? '0' + minute : minute}`
+});
 
 type DataComputed = {
   lat: number,
@@ -24,6 +30,7 @@ const name = ref('');
 const description = ref('');
 const descriptionCita = ref('');
 const nextDate = ref(new Date());
+const time = ref('00:00');
 async function fetchAddress (): Promise<string> {
   const data: DataComputed | null = getData('newrevisita');
   if (!data) {
@@ -84,15 +91,10 @@ async function onClick() {
   <MTextarea v-model="description" class="w-full mb-4" label="Descripcion de la casa" />
   <MTextarea v-model="descriptionCita" class="w-full mb-4" label="Notas de la visita" />
   <MTitle size='sm' align="center" class="mb-4">¿Cuando es la siguiente visita?</MTitle>
-  <VueDatePicker
-    v-model="nextDate"
-    :preview-format="() => ''"
-    format="iiii i 'de' LLLL 'del' yyyy h:m a"
-    :format-locale="es"
-    select-text="Elegir"
-    cancel-text="Cancelar"
-    class="mb-4"
-  />
+  <div class="flex gap-2">
+    <MInputDate v-model="nextDate" class="mb-4" />
+    <MInputClock v-model="time" class="mb-4" />
+  </div>
   <button
       type="button"
       class="rounded bg-blue-500 text-white px-4 py-2 w-full"
