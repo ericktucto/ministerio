@@ -36,6 +36,7 @@ async function fetchAddress (): Promise<string> {
   if (!data) {
     return ''
   }
+  console.warn(data);
   try {
     const json: nominatim.ReverseResponse = await nominatim.reverse(data.lat, data.lng);
     const address = [];
@@ -72,6 +73,7 @@ async function onClick() {
   rev.setAddress(
     await fetchAddress()
   );
+  return;
 
   const cita = new Cita();
   cita.setDateObj(new Date()); // hoy

@@ -56,23 +56,6 @@ function onModalAnimationEnd() {
   }
   toclose.value = true;
 }
-function createDate(value: number, to: 'day' | 'month' | 'year') {
-  if (!tempValue.value || !value) {
-    return;
-  }
-  const date = new Date(tempValue.value);
-  if (to === 'day') {
-    date.setDate(value);
-  }
-  if (to === 'month') {
-    date.setMonth(value);
-  }
-  if (to === 'year') {
-    date.setFullYear(value);
-  }
-  console.warn("createDate", date);
-  emit('update:modelValue', date);
-}
 </script>
 <template>
   <span
