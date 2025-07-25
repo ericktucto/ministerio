@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { HugeiconsIcon } from '@hugeicons/vue';
 import { Clock01Icon } from '@hugeicons/core-free-icons';
-import { onMounted, computed, ref } from 'vue';
+import { computed, ref } from 'vue';
 import ScrollItems from '@/components/atoms/ScrollItems.vue';
 
 const opened = ref(false);
