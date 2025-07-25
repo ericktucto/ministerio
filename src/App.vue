@@ -4,7 +4,7 @@ import ContentView from '@/components/organisms/ContentView.vue'
 import ToolBar from '@/components/organisms/ToolBar.vue'
 import ModalResponse from '@/components/organisms/ModalResponse.vue'
 import NewRevisita from '@/components/organisms/NewRevisita.vue';
-import { idModal, getModal, onCloseModal, resolveModal, active, modalKey, getData } from './modal';
+import { idModal, getModal, resolveModal, getData, modalKey } from './modal';
 provide(modalKey, {
     resolveModal,
     getModal,
@@ -16,7 +16,7 @@ provide(modalKey, {
         <ContentView />
         <ToolBar />
     </div>
-    <ModalResponse :active="active" @close="onCloseModal">
+    <ModalResponse>
         <NewRevisita v-if="idModal == 'newrevisita'" />
     </ModalResponse>
 </template>

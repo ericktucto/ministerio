@@ -36,7 +36,6 @@ async function fetchAddress (): Promise<string> {
   if (!data) {
     return ''
   }
-  console.warn(data);
   try {
     const json: nominatim.ReverseResponse = await nominatim.reverse(data.lat, data.lng);
     const address = [];

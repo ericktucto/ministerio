@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { active, onCloseModal } from '@/modal';
 
-defineProps<{ active: boolean }>()
 const emit = defineEmits<{ (e: 'close'): void }>()
 const shown = ref(false);
 const toclose = ref(false);
@@ -11,6 +11,7 @@ function onContainerAnimationEnd() {
 function onBackgroundAnimationEnd() {
   if (toclose.value) {
     emit('close')
+    onCloseModal();
     toclose.value = false;
     return;
   }
@@ -40,18 +41,18 @@ function onClose() {
     ></div>
     <div
       data-type="body"
-      class="fixed w-dvw h-dvh grid items-end
+      class="fixed w-dvw h-dvh grid
         transition-all ease-in-out duration-300
       "
-      @click="onClose"
     >
+      <div class="min-h-20"
+        @click="onClose"
+      ></div>
       <div class="w-full bg-white rounded-t-2xl p-4 shadow-lg">
         <!-- Barra superior del modal -->
         <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
         <!-- Aquí irían los controles (omitidos) -->
         <slot></slot>
-        <!-- Espacio reservado -->
-        <div class="h-40"></div>
       </div>
     </div>
   </div>
