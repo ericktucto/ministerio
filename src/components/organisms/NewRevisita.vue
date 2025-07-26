@@ -19,7 +19,9 @@ onMounted(() => {
   const now = new Date();
   const hour = now.getHours();
   const minute = now.getMinutes();
-  time.value = `${hour}:${minute < 10 ? '0' + minute : minute}`
+  const amPm = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  time.value = `${String(hour12).padStart(2, '0')}:${String(minute).padStart(2, '0')} ${amPm}`
 });
 
 type DataComputed = {
@@ -30,7 +32,7 @@ const name = ref('');
 const description = ref('');
 const descriptionCita = ref('');
 const nextDate = ref(new Date());
-const time = ref('00:00');
+const time = ref('01:00 AM');
 async function fetchAddress (): Promise<string> {
   const data: DataComputed | null = getData('newrevisita');
   if (!data) {
@@ -72,12 +74,17 @@ async function onClick() {
   rev.setAddress(
     await fetchAddress()
   );
-  return;
 
   const cita = new Cita();
   cita.setDateObj(new Date()); // hoy
   cita.setDescription(descriptionCita.value);
-  cita.setNextDateObj(nextDate.value);
+  const n = new Date(nextDate.value)
+  const amPm = time.value.slice(-2).toUpperCase().trim();
+  const hours = time.value.split(':')[0].trim();
+  const minutes = time.value.replace(/(AM|PM)/, '').split(':')[1].padStart(2, '0').trim();
+  n.setMinutes(Number(minutes));
+  n.setHours(amPm == 'PM' ? Number(hours) + 12 : Number(hours));
+  cita.setNextDateObj(n);
 
   resolveModal({ revisita: rev, cita });
   name.value = '';

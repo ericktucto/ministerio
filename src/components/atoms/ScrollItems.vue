@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref } from 'vue';
 
 const props = defineProps<{
   modelValue: string,
@@ -21,96 +21,89 @@ function scrollToCenter(event: Event) {
 const scrollContainer = ref<HTMLDivElement|null>(null);
 const items = ref<HTMLDivElement[]>([]);
 async function scrollBoot() {
-  if (!scrollContainer.value) {
+  if (!scrollContainer.value || items.value.length == 0) {
     await nextTick();
-    if (!scrollContainer.value) {
+    if (!scrollContainer.value || items.value.length == 0) {
       return;
     }
   }
-  detectCenterElement(
-    scrollContainer.value,
-    items.value,
-  );
-  const divElement: HTMLDivElement|null = scrollContainer.value.querySelector(`div[data-value="${props.modelValue}"]`);
-  // @todo: verificar cuando no existe el elemento dentro de las opciones
+  const divElement = getElementCenter(scrollContainer.value as HTMLDivElement);
   if (divElement) {
     scrollToDiv(divElement);
   }
 }
 
-const isScrolling = ref<boolean>(false);
-// detect div center when scroll
-let observer: IntersectionObserver | null = null;
-let scrollTimeout: number | null = null;
-function detectCenterElement(
-  scrollDiv: HTMLDivElement,
-  itemElements: HTMLDivElement[]
-): void {
-  function calcCenter(container: HTMLDivElement, div: HTMLDivElement): boolean {
-    const rect = div.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
-    const itemCenter = rect.top + rect.height / 2;
-    const containerCenter = containerRect.top + containerRect.height / 2;
+function getElementCenter(container: HTMLDivElement): HTMLDivElement|null {
+  const containerRect = container.getBoundingClientRect();
+  const centerY = containerRect.top + containerRect.height / 2;
 
-    return Math.abs(itemCenter - containerCenter) < rect.height / 2
-  }
-  observer = new IntersectionObserver((entries) => {
-    if (isScrolling.value) {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const elm = items.value.find(
-            (item) => calcCenter(scrollDiv, item)
-          );
-          if (elm) {
-            emit('update:modelValue', (elm.dataset.value as string));
-          }
-        }
-      });
+  const children = Array.from(container.children) as HTMLDivElement[];
+
+  for (const child of children) {
+    const childRect = child.getBoundingClientRect();
+    if (childRect.top <= centerY && childRect.bottom >= centerY) {
+      return child;
     }
-  }, {
-    root: scrollDiv,
-    threshold: 1.0, // Detecta cuando el elemento está completamente visible
-  });
-
-  itemElements.forEach((item) => observer?.observe(item));
-}
-function handleScroll() {
-  isScrolling.value = true;
-  if (scrollTimeout) {
-    clearTimeout(scrollTimeout);
   }
-  scrollTimeout = window.setTimeout(() => {
-    isScrolling.value = false;
-  }, 500);
+  return null;
+}
+function customScroll(e: Event) {
+  const div = (e.target as HTMLDivElement);
+  const centerDiv = getElementCenter(div);
+  if (centerDiv) {
+    const value = (centerDiv.dataset.value as string);
+    if (value != props.modelValue) {
+      emit('update:modelValue', value);
+    }
+  }
 }
 onMounted(() => {
   scrollBoot();
 });
-onBeforeUnmount(() => {
-  if (observer) {
-    observer.disconnect();
-  }
-  if (scrollTimeout) {
-    clearTimeout(scrollTimeout);
-  }
-});
 </script>
 <template>
-  <div
-    ref="scrollContainer"
-    class="overflow-y-scroll relative"
-    @scroll="handleScroll"
-  >
+  <div class="relative">
     <div
-      ref="items"
-      v-for="(item, index) in options"
-      :key="`option-${index}`"
-      @click="scrollToCenter"
-      class="px-4 py-2 text-center cursor-pointer select-none text-gray-600"
-      :class="{
-        'bg-blue-500 text-white': modelValue === item,
-      }"
-      :data-value="item"
-    >{{ item }}</div>
+      ref="scrollContainer"
+      class="picker w-16 overflow-y-scroll snap-y snap-mandatory rounded-[30px] bg-gray-200 rounded-xl scrollbar-hidden"
+      @scroll="customScroll"
+      :style="`height: ${5 * 40}px`"
+    >
+      <div
+        v-for="_ in 2"
+        class="item flex items-center justify-center snap-center text-base pointer-events-none"
+        style="height: 40px"></div>
+      <div
+        ref="items"
+        v-for="value in options"
+        :key="value"
+        class="item flex items-center justify-center snap-center text-base select-none"
+        :class="{
+          'bg-blue-500 text-white': Number(value) == Number(modelValue)
+        }"
+        :data-value="value"
+        style="height: 40px"
+        @click="scrollToCenter"
+      >
+        {{ value }}
+      </div>
+      <div
+        v-for="_ in 2"
+        class="item flex items-center justify-center snap-center text-base pointer-events-none"
+        style="height: 40px"></div>
+    </div>
+    <div
+      class="highlight absolute inset-x-0 top-1/2 translate-y-[-50%] w-16 border-t border-b border-gray-300 pointer-events-none"
+      style="height: 40px"
+    ></div>
   </div>
 </template>
+<style scoped>
+/* Tailwind no incluye scrollbar-hide por defecto; puedes usar un plugin o CSS global */
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hidden {
+  scrollbar-width: none;
+}
+</style>

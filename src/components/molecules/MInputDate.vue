@@ -15,19 +15,18 @@ const numbersDays = computed(() => {
   return Array.from({ length: date.getDate() }, (_, i) => String(i + 1).padStart(2, '0'));
 });
 // split :
-const day = computed(() => {
-  const value = props.modelValue.getDate();
-  return String(value).padStart(2, '0');
-});
-const month = computed(() => {
-  const value = props.modelValue.getMonth() + 1;
-  return String(value).padStart(2, '0');
-});
-const year = computed(() => {
-  const value = props.modelValue.getFullYear();
-  return String(value);
+const day = ref('01');
+const month = ref('01');
+const year = ref((new Date()).getFullYear().toString());
+const display = computed(() => {
+  console.warn(props.modelValue);
+  const date = props.modelValue.getDate().toString().padStart(2, '0')
+  const month = (props.modelValue.getMonth() + 1).toString().padStart(2, '0')
+  const year = props.modelValue.getFullYear().toString()
+  return `${date}-${month}-${year}`
 });
 const tempValue = ref();
+
 function onOpen(e: Event) {
   const elm = e.target as HTMLElement;
   if (elm.tagName.toUpperCase() != 'SPAN') {
@@ -35,6 +34,12 @@ function onOpen(e: Event) {
       const cancel = elm.dataset.cancel == '1';
       if (cancel && tempValue.value) {
         emit('update:modelValue', tempValue.value);
+      } else {
+        const d = new Date();
+        d.setFullYear(Number(year.value));
+        d.setMonth(Number(month.value) - 1);
+        d.setDate(Number(day.value));
+        emit('update:modelValue', d);
       }
       startanimation.value = false;
     }
@@ -69,7 +74,7 @@ function onModalAnimationEnd() {
       :size="16"
       :strokeWidth="2"
     />
-    <span>{{ day }}-{{ month }}-{{ year }}</span>
+    <span>{{ display }}</span>
     <div
       class="minputclockmodal flex fixed top-0 left-0 items-center justify-center w-dvw h-dvh"
       :class="{ startanimation }"
@@ -88,28 +93,22 @@ function onModalAnimationEnd() {
           <div>
             <h3 class="mb-2">Día</h3>
             <ScrollItems
-              :modelValue="day"
-              @update:modelValue="$emit('update:modelValue', new Date(`${year}-${month}-${$event}`))"
+              v-model="day"
               :options="numbersDays"
-              style="height: 200px"
             />
           </div>
           <div>
             <h3 class="mb-2">Mes</h3>
             <ScrollItems
-              :modelValue="month"
-              @update:modelValue="$emit('update:modelValue', new Date(`${year}-${$event}-${day}`))"
+              v-model="month"
               :options="numbersMonths"
-              style="height: 200px"
             />
           </div>
           <div>
             <h3 class="mb-2">Año</h3>
             <ScrollItems
-              :modelValue="year"
-              @update:modelValue="$emit('update:modelValue', new Date(`${$event}-${month}-${day}`))"
+              v-model="year"
               :options="numbersYears"
-              style="height: 200px"
             />
           </div>
         </div>

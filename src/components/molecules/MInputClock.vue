@@ -10,8 +10,15 @@ const numbersMinutes = Array.from({ length: 60 }, (_, i) => String(i).padStart(2
 const numbersHours = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
 
 // split :
-const hours = computed(() => props.modelValue.split(':')[0]);
-const minutes = computed(() => props.modelValue.split(':')[1]);
+const amPm = computed(() => {
+  const lastTwoChars = props.modelValue.slice(-2);
+  return lastTwoChars.toUpperCase().trim();
+});
+const hours = computed(() => props.modelValue.split(':')[0].trim());
+const minutes = computed(() => {
+  const value = props.modelValue.replace(/(AM|PM)/, '');
+  return String(value.split(':')[1]).padStart(2, '0').trim();
+});
 const tempValue = ref('');
 function onOpen(e: Event) {
   const elm = e.target as HTMLElement;
@@ -71,22 +78,44 @@ function onModalAnimationEnd() {
       >
         <div class="flex items-center justify-evenly">
           <div>
-            <h3 class="mb-2">Horas</h3>
+            <h3 class="mb-2 text-center">Horas</h3>
             <ScrollItems
               :modelValue="hours"
-              @update:modelValue="$emit('update:modelValue', `${$event}:${minutes}`)"
+              @update:modelValue="$emit('update:modelValue', `${$event}:${minutes} ${amPm}`)"
               :options="numbersHours"
-              style="height: 200px"
             />
           </div>
           <div>
-            <h3 class="mb-2">Minutos</h3>
+            <h3 class="mb-2 text-center">Minutos</h3>
             <ScrollItems
               :modelValue="minutes"
-              @update:modelValue="$emit('update:modelValue', `${hours}:${$event}`)"
+              @update:modelValue="$emit('update:modelValue', `${hours}:${$event} ${amPm}`)"
               :options="numbersMinutes"
-              style="height: 200px"
             />
+          </div>
+          <div>
+            <h3 class="mb-2 text-center">AM/PM</h3>
+            <div
+              class="picker w-16 overflow-y-scroll snap-y snap-mandatory rounded-[30px] bg-gray-200 rounded-xl scrollbar-hidden"
+              :style="`height: ${2 * 40}px`"
+            >
+              <div
+                class="item flex items-center justify-center snap-center text-base select-none"
+                :class="{
+                  'bg-blue-500 text-white': amPm == 'AM'
+                }"
+                style="height: 40px"
+                @click="$emit('update:modelValue', `${hours}:${minutes} AM`)"
+              >AM</div>
+              <div
+                class="item flex items-center justify-center snap-center text-base select-none"
+                :class="{
+                  'bg-blue-500 text-white': amPm == 'PM'
+                }"
+                style="height: 40px"
+                @click="$emit('update:modelValue', `${hours}:${minutes} PM`)"
+              >PM</div>
+            </div>
           </div>
         </div>
         <div class="flex justify-evenly items-center">
