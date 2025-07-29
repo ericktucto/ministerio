@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { active, onCloseModal } from '@/modalfloat';
+import { active, idModal, onCloseModal } from '@/modalfloat';
 
 const emit = defineEmits<{
   close: [void],
@@ -8,18 +8,26 @@ const emit = defineEmits<{
 }>()
 const shown = ref(false);
 const toclose = ref(false);
-function onContainerAnimationEnd() {
-  shown.value = true;
-}
-function onBackgroundAnimationEnd() {
-  if (toclose.value) {
+function onContainerAnimationEnd(e: Event) {
+  // this event is closed
+  if (!active.value && !toclose.value) {
     emit('close')
-    onCloseModal();
-    toclose.value = false;
-    return;
+    idModal.value = ''
   }
-  emit('opened');
-  toclose.value = true;
+  const div = e.target as HTMLDivElement;
+  if (div.dataset.type == 'container') {
+    shown.value = true;
+  }
+  if (div.dataset.type == 'background') {
+    if (toclose.value) {
+      onCloseModal();
+      toclose.value = false;
+      return;
+    }
+    // this event is opened
+    emit('opened');
+    toclose.value = true;
+  }
 }
 const bodyModal = ref<HTMLElement | null>(null);
 function onClose(e: Event) {
@@ -47,7 +55,6 @@ function onClose(e: Event) {
       class="w-full h-full absolute bg-black opacity-0
         transition-opacity ease-in-out duration-300
       "
-      @transitionend="onBackgroundAnimationEnd"
     ></div>
     <div
       ref="bodyModal"

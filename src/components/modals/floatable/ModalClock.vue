@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { getData, resolveModal } from '@/modalfloat';
+import { getData, resolveModal, onCloseModal } from '@/modalfloat';
 import ScrollItems from '@/components/atoms/ScrollItems.vue';
 
 interface TimeData {
@@ -13,12 +13,8 @@ const hours = ref(numbersHours[0]);
 const minutes = ref(numbersMinutes[0]);
 const amPm = ref('AM');
 
-const tempValue = ref(new Date)
 function onAccept() {
   resolveModal({ time: `${hours.value}:${minutes.value} ${amPm.value}` })
-}
-function onClose() {
-  resolveModal({ date: tempValue.value });
 }
 onMounted(() => {
   const data = getData<TimeData>('timeselect');
@@ -82,7 +78,7 @@ onMounted(() => {
         type="button"
         class="py-2 px-4 bg-red-500 rounded-md text-white"
         data-cancel="1"
-        @click="onClose"
+        @click="onCloseModal"
       >Cancelar</button>
     </div>
   </div>
