@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue';
+import { debounce } from '@/models/utils';
+import { ref, watch } from 'vue';
 
 const props = defineProps<{
   modelValue: string,
@@ -8,32 +9,46 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: string],
 }>()
-function scrollToDiv(divElement: HTMLDivElement) {
+async function scrollToDiv(divElement: HTMLDivElement) {
   const dataValue = (divElement.dataset.value as string);
   divElement.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  const waitDivElementIntoCenter = () => new Promise(
+    (resolve) => {
+      const id = setInterval(() => {
+        const centered = getElementCenter();
+        if (centered?.dataset?.value == dataValue) {
+          clearInterval(id);
+          resolve(true);
+        }
+      }, 100);
+    }
+  );
+  await waitDivElementIntoCenter();
   emit('update:modelValue', dataValue);
 }
-function scrollToCenter(event: Event) {
+function onClickItem(event: Event) {
   scrollToDiv(
     (event.target as HTMLDivElement)
   );
 }
 const scrollContainer = ref<HTMLDivElement|null>(null);
 const items = ref<HTMLDivElement[]>([]);
-async function scrollBoot() {
-  if (!scrollContainer.value || items.value.length == 0) {
-    await nextTick();
-    if (!scrollContainer.value || items.value.length == 0) {
-      return;
+watch(() => props.modelValue, (newValue, oldValue) => {
+  if (newValue !== oldValue && scrollContainer.value) {
+    const children = Array.from(scrollContainer.value.children) as HTMLDivElement[];
+    const divElement = children.find(c => c.dataset.value == newValue);
+    if (divElement) {
+      scrollToDiv(
+        divElement as HTMLDivElement
+      )
     }
   }
-  const divElement = getElementCenter(scrollContainer.value as HTMLDivElement);
-  if (divElement) {
-    scrollToDiv(divElement);
+});
+function getElementCenter(): HTMLDivElement|null {
+  const container = scrollContainer.value;
+  if (!container) {
+    return null;
   }
-}
-
-function getElementCenter(container: HTMLDivElement): HTMLDivElement|null {
   const containerRect = container.getBoundingClientRect();
   const centerY = containerRect.top + containerRect.height / 2;
 
@@ -47,19 +62,12 @@ function getElementCenter(container: HTMLDivElement): HTMLDivElement|null {
   }
   return null;
 }
-function customScroll(e: Event) {
-  const div = (e.target as HTMLDivElement);
-  const centerDiv = getElementCenter(div);
+const customScroll = debounce(() => {
+  const centerDiv = getElementCenter();
   if (centerDiv) {
-    const value = (centerDiv.dataset.value as string);
-    if (value != props.modelValue) {
-      emit('update:modelValue', value);
-    }
+    scrollToDiv(centerDiv);
   }
-}
-onMounted(() => {
-  scrollBoot();
-});
+}, 150);
 </script>
 <template>
   <div class="relative">
@@ -83,7 +91,7 @@ onMounted(() => {
         }"
         :data-value="value"
         style="height: 40px"
-        @click="scrollToCenter"
+        @click="onClickItem"
       >
         {{ value }}
       </div>
