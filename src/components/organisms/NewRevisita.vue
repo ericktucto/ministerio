@@ -100,7 +100,7 @@ async function onClick() {
   <MTextarea v-model="descriptionCita" class="w-full mb-4" label="Notas de la visita" />
   <MTitle size='sm' align="center" class="mb-4">¿Cuando es la siguiente visita?</MTitle>
   <div class="flex gap-2">
-    <MInputDate v-model="nextDate" class="mb-4" />
+    <MInputDate v-model="nextDate" class="mb-4 flex-1 text-nowrap" />
     <MInputClock v-model="time" class="mb-4" />
   </div>
   <button

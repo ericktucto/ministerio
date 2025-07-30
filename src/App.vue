@@ -8,6 +8,7 @@ import { idModal, getModal, resolveModal, getData, modalKey } from './modal';
 import { idModal as idModalFloat, modalKey as modalKeyFloat, config } from './modalfloat';
 import MModalFloat from './components/atoms/MModalFloat.vue';
 import ModalClock from './components/modals/floatable/ModalClock.vue';
+import ModalDate from './components/modals/floatable/ModalDate.vue';
 provide(modalKey, {
     resolveModal,
     getModal,
@@ -25,5 +26,6 @@ provide(modalKeyFloat, config);
     </ModalResponse>
     <MModalFloat>
       <ModalClock v-if="idModalFloat == 'timeselect'"/>
+      <ModalDate v-if="idModalFloat == 'dateselect'"/>
     </MModalFloat>
 </template>

@@ -73,21 +73,21 @@ const customScroll = debounce(() => {
   <div class="relative">
     <div
       ref="scrollContainer"
-      class="picker w-16 overflow-y-scroll snap-y snap-mandatory rounded-[30px] bg-gray-200 rounded-xl scrollbar-hidden"
+      class="overflow-y-scroll snap-y snap-mandatory rounded-[30px] bg-gray-200 rounded-xl scrollbar-hidden"
       @scroll="customScroll"
       :style="`height: ${5 * 40}px`"
     >
       <div
         v-for="_ in 2"
-        class="item flex items-center justify-center snap-center text-base pointer-events-none"
+        class="px-3 item flex items-center justify-center snap-center text-base pointer-events-none"
         style="height: 40px"></div>
       <div
         ref="items"
         v-for="value in options"
         :key="value"
-        class="item flex items-center justify-center snap-center text-base select-none"
+        class="px-3 item flex items-center justify-center snap-center text-base select-none"
         :class="{
-          'bg-blue-500 text-white': Number(value) == Number(modelValue)
+          'bg-blue-500 text-white': value == modelValue,
         }"
         :data-value="value"
         style="height: 40px"
@@ -97,11 +97,11 @@ const customScroll = debounce(() => {
       </div>
       <div
         v-for="_ in 2"
-        class="item flex items-center justify-center snap-center text-base pointer-events-none"
+        class="px-3 item flex items-center justify-center snap-center text-base pointer-events-none"
         style="height: 40px"></div>
     </div>
     <div
-      class="highlight absolute inset-x-0 top-1/2 translate-y-[-50%] w-16 border-t border-b border-gray-300 pointer-events-none"
+      class="highlight absolute inset-x-0 top-1/2 translate-y-[-50%] border-t border-b border-gray-300 pointer-events-none"
       style="height: 40px"
     ></div>
   </div>
