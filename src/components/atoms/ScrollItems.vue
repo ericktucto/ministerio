@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { debounce } from '@/models/utils';
-import { ref, watch } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 
 const props = defineProps<{
   modelValue: string,
@@ -43,6 +43,24 @@ watch(() => props.modelValue, (newValue, oldValue) => {
       )
     }
   }
+});
+async function selectedItemWhenChangeOptions(newOptions: string[]) {
+  if (newOptions.length > 0) {
+    // esperar que se rendericen los items
+    await nextTick()
+    // la primera busqueda es para encontrar el div que tiene el modelValue
+    // la segunda busqueda es para encontrar el div que tiene el primer valor,
+    // esta segunda busqueda es para cuando el modelValue no esta en la lista
+    let selected = items.value.find((i) => String(i.dataset.value) === props.modelValue)
+        || items.value.find((i) => String(i.dataset.value) === newOptions[0]);
+    console.warn({ selected: selected?.dataset.value });
+    if (selected) {
+      scrollToDiv(selected);
+    }
+  }
+}
+watch(() => props.options, (newValue, _) => {
+  selectedItemWhenChangeOptions(newValue);
 });
 function getElementCenter(): HTMLDivElement|null {
   const container = scrollContainer.value;
