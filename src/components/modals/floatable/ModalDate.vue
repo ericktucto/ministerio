@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getData, resolveModal, onCloseModal } from '@/modalfloat';
 import ScrollItems from '@/components/atoms/ScrollItems.vue';
 
