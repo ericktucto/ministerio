@@ -37,7 +37,6 @@ async function _search(text: string) {
   const search = text.trim().toLowerCase();
   const repo = new RevisitaRepository();
   const revisitas = await repo.all();
-  console.warn({ revisitas });
   const result: ResultInput[] = revisitas.filter((revisita) => {
     return revisita.getName().includes(search)
       || revisita.getAddress().includes(search)

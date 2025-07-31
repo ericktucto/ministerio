@@ -8,8 +8,9 @@ import type Revisita from '@/models/revisita';
 import { revisitaToMarker } from '@/adapters';
 import CardInfo from '@/components/organisms/CardInfo.vue';
 import TopActionMap from '@/components/organisms/TopActionMap.vue';
-import type Cita from '@/models/cita';
+import Cita from '@/models/cita';
 import CitaRepository from '@/repositories/cita';
+import { getModal, type ModalError } from '@/modal';
 
 // dom references
 const addrev = ref<HTMLElement | null>(null);
@@ -89,6 +90,29 @@ async function onDeleteRevisita() {
     await loadRevisitas();
   }
 }
+interface ModalResponse {
+  cita: Cita;
+}
+async function onCreateNewCita() {
+  console.warn(currentRevisita.value);
+  if (!currentRevisita.value) {
+    return;
+  }
+  const id = currentRevisita.value.getId();
+  const revisitas = await (new RevisitaRepository()).all()
+  const revisita = revisitas.find(
+    (rev) => rev.getId() === id
+  );
+
+  const result = await getModal<ModalResponse | ModalError>('newcita', { revisita })
+  if ('error' in result) {
+    return;
+  }
+  const repo = new CitaRepository();
+  const cita = await repo.save(result.cita);
+  currentCita.value = cita;
+}
+
 async function onShowTo(data: {
   id?: string,
   lat?: number,
@@ -145,6 +169,7 @@ onMounted(() => {
       :revisita="(currentRevisita as Revisita)"
       :lastCita="(currentCita as Cita)"
       @trash="onDeleteRevisita"
+      @newCita="onCreateNewCita"
     />
   </div>
 </template>

@@ -9,6 +9,7 @@ import { idModal as idModalFloat, modalKey as modalKeyFloat, config } from './mo
 import MModalFloat from './components/atoms/MModalFloat.vue';
 import ModalClock from './components/modals/floatable/ModalClock.vue';
 import ModalDate from './components/modals/floatable/ModalDate.vue';
+import NewCita from './components/modals/bottomsheet/NewCita.vue';
 provide(modalKey, {
     resolveModal,
     getModal,
@@ -23,6 +24,7 @@ provide(modalKeyFloat, config);
     </div>
     <ModalResponse>
         <NewRevisita v-if="idModal == 'newrevisita'" />
+        <NewCita v-if="idModal == 'newcita'" />
     </ModalResponse>
     <MModalFloat>
       <ModalClock v-if="idModalFloat == 'timeselect'"/>

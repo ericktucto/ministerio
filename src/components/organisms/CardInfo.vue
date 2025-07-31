@@ -15,6 +15,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   trash: [],
+  newCita: [],
 }>();
 function onShowMap() {
   if (
@@ -31,9 +32,10 @@ const formattedNexDate = computed(() => {
   if (!props.lastCita) {
     return '---';
   }
+  console.warn(props.lastCita)
   return format(
     props.lastCita.getNextDateObj(),
-    "iiii i 'de' LLLL 'del' yyyy h:m a",
+    "iiii dd 'de' MMMM 'del' yyyy h:mm a",
     { locale: es }
   );
 });
@@ -107,6 +109,7 @@ const formattedNexDate = computed(() => {
         >Eliminar</button>
         <button
           class="flex-1 py-2 px-4 rounded-br-xl bg-blue-500 text-white"
+          @click="$emit('newCita')"
         >Hice una cita</button>
       </div>
     </div>
