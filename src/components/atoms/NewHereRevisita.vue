@@ -42,7 +42,7 @@ async function onNewRevisita(popup: L.Popup) {
   const rev = await repo.save(revisita);
 
   cita.setRevisitaId(rev.getId());
-  (new CitaRepository).save(cita);
+  await (new CitaRepository).save(cita);
   emit(
     'newRevisita',
     rev

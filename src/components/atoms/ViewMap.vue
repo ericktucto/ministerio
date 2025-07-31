@@ -50,11 +50,6 @@ function loopToGPS(position: GeolocationPosition) {
 async function loadMap() {
     await nextTick();
     const center: L.LatLng = new L.LatLng(props.lat, props.lng);
-    if (props.gps && navigator.geolocation) {
-      const position = await gps(loopToGPS);
-      center.lat = position.coords.latitude;
-      center.lng = position.coords.longitude;
-    }
     if (mapcontainer.value) {
         const m = L.map(mapcontainer.value, {
             center,
@@ -68,6 +63,10 @@ async function loadMap() {
         m.on('click', (e) => emit('touched', e, m));
         map.value = m;
         emit('initialized', m);
+    }
+    if (props.gps && navigator.geolocation) {
+      gps(loopToGPS)
+        .catch((e) => console.error(e));
     }
 }
 function setMarkers(markers: L.Marker[]) {

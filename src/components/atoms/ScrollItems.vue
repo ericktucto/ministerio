@@ -53,7 +53,6 @@ async function selectedItemWhenChangeOptions(newOptions: string[]) {
     // esta segunda busqueda es para cuando el modelValue no esta en la lista
     let selected = items.value.find((i) => String(i.dataset.value) === props.modelValue)
         || items.value.find((i) => String(i.dataset.value) === newOptions[0]);
-    console.warn({ selected: selected?.dataset.value });
     if (selected) {
       scrollToDiv(selected);
     }

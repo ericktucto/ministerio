@@ -33,6 +33,7 @@ onMounted(() => {
         <ScrollItems
           v-model="hours"
           :options="numbersHours"
+          class="w-16"
         />
       </div>
       <div>
@@ -40,12 +41,13 @@ onMounted(() => {
         <ScrollItems
           v-model="minutes"
           :options="numbersMinutes"
+          class="w-16"
         />
       </div>
       <div>
         <h3 class="mb-2 text-center">AM/PM</h3>
         <div
-          class="picker w-16 overflow-y-scroll snap-y snap-mandatory rounded-[30px] bg-gray-200 rounded-xl scrollbar-hidden"
+          class="picker w-16 overflow-y-hidden snap-y snap-mandatory rounded-[30px] bg-gray-200 rounded-xl scrollbar-hidden"
           :style="`height: ${2 * 40}px`"
         >
           <div

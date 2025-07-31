@@ -3,7 +3,7 @@ import Repository, { To } from "./repository";
 
 @To(Cita)
 export default class CitaRepository extends Repository<Cita> {
-    protected getTableName(): string {
-        return 'revisitas';
-    }
+  protected getTableName(): string {
+    return 'citas';
+  }
 }
