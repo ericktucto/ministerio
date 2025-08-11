@@ -26,7 +26,11 @@ export function getModal<T = any>(modal: string, data: any): Promise<T> {
     _resolve = resolve;
   });
 }
-
+export const config = {
+  resolveModal,
+  getModal,
+  getData,
+}
 export type ModalError = {
   error: string[];
 };

@@ -40,17 +40,17 @@ async function loadRevisitas() {
     })
   );
 }
-async function lastCita(revisita: Revisita): Promise<Cita|null> {
+async function lastCita(revisita: Revisita): Promise<Cita | null> {
   const repo = new CitaRepository();
   const result = await repo.all()
   const citas = result
     .filter((cita) => cita.getRevisitaId() == revisita.getId())
     .sort(
-      (citaA, citaB) => citaA.getDateObj().getTime() - citaB.getDateObj().getTime()
+      (citaA, citaB) => citaB.getDateObj().getTime() - citaA.getDateObj().getTime()
     );
   return citas.length > 0 ? citas[0] : null;
 }
-async function setCurrentRevisita(revisita: Revisita|null) {
+async function setCurrentRevisita(revisita: Revisita | null) {
   if (revisita === null) {
     currentRevisita.value = null;
     currentCita.value = null;
@@ -94,7 +94,6 @@ interface ModalResponse {
   cita: Cita;
 }
 async function onCreateNewCita() {
-  console.warn(currentRevisita.value);
   if (!currentRevisita.value) {
     return;
   }
@@ -109,6 +108,7 @@ async function onCreateNewCita() {
     return;
   }
   const repo = new CitaRepository();
+  result.cita.setRevisitaId(id);
   const cita = await repo.save(result.cita);
   currentCita.value = cita;
 }
@@ -145,33 +145,14 @@ onMounted(() => {
   <div class="grid h-full containermap relative">
     <template>
       <div ref="addrev" class="flex py-3">
-        <NewHereRevisita
-          :popup="(popup as L.Popup)"
-          @newRevisita="onNewRevisita"
-        />
+        <NewHereRevisita :popup="(popup as L.Popup)" @newRevisita="onNewRevisita" />
       </div>
     </template>
-    <ViewMap
-      ref="map"
-      class="h-full"
-      @touched="onTouched"
-      @initialized="() => loadRevisitas()"
-      gps
-      :lat="40.4165"
-      :lng="-3.70256"
-    />
-    <TopActionMap
-      @myLocation="() => map?.goToMyLocation()"
-      @showto="onShowTo"
-      @focusinput="setCurrentRevisita(null)"
-    />
-    <CardInfo
-      :revisita="(currentRevisita as Revisita)"
-      :lastCita="(currentCita as Cita)"
-      @trash="onDeleteRevisita"
-      @newCita="onCreateNewCita"
-    />
+    <ViewMap ref="map" class="h-full" @touched="onTouched" @initialized="() => loadRevisitas()" gps :lat="40.4165"
+      :lng="-3.70256" />
+    <TopActionMap @myLocation="() => map?.goToMyLocation()" @showto="onShowTo" @focusinput="setCurrentRevisita(null)" />
+    <CardInfo :revisita="(currentRevisita as Revisita)" :lastCita="(currentCita as Cita)" @trash="onDeleteRevisita"
+      @newCita="onCreateNewCita" />
   </div>
 </template>
-<style>
-</style>
+<style></style>

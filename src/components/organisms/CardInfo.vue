@@ -32,7 +32,6 @@ const formattedNexDate = computed(() => {
   if (!props.lastCita) {
     return '---';
   }
-  console.warn(props.lastCita)
   return format(
     props.lastCita.getNextDateObj(),
     "iiii dd 'de' MMMM 'del' yyyy h:mm a",
