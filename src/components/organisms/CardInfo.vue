@@ -3,7 +3,11 @@ import { computed } from 'vue';
 import { format } from 'date-fns/format';
 import { es } from 'date-fns/locale';
 import { HugeiconsIcon } from '@hugeicons/vue';
-import { User03Icon, Clock01Icon } from '@hugeicons/core-free-icons';
+import {
+  User03Icon,
+  Clock01Icon,
+  Delete02Icon,
+} from '@hugeicons/core-free-icons';
 import type Revisita from '@/models/revisita';
 import MTitle from '@/components/atoms/MTitle.vue';
 import MBadge from '@/components/atoms/MBadge.vue';
@@ -17,6 +21,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   trash: [];
   newCita: [];
+  trashCita: [cita: Cita];
 }>();
 function onShowMap() {
   if (document.activeElement && document.activeElement instanceof HTMLElement) {
@@ -50,6 +55,9 @@ const formattedNexDate = computed(() => {
     { locale: es },
   );
 });
+function onDeleteCita(cita: Cita) {
+  emit('trashCita', cita);
+}
 </script>
 <template>
   <div
@@ -59,7 +67,7 @@ const formattedNexDate = computed(() => {
   >
     <div
       tabindex="0"
-      class="flex flex-1 bg-white rounded-xl shadow-md transition-all duration-300 ease-in-out focus:flex-col focus:h-[30rem] focus-within:flex-col focus-within:h-[30rem] h-[7.25rem]"
+      class="flex flex-1 bg-white rounded-xl shadow-md transition-all duration-300 ease-in-out focus:flex-col focus:h-[30rem] focus-within:flex-col focus-within:h-[30rem] h-[7.25rem] w-[calc(100%-2rem)] max-w-[calc(100%-2rem)"
     >
       <div
         class="images bg-blue-500 flex justify-center items-center text-white w-[6rem] rounded-s-xl"
@@ -71,7 +79,7 @@ const formattedNexDate = computed(() => {
           :strokeWidth="1.5"
         />
       </div>
-      <div class="grid content-between overflow-y-auto p-4">
+      <div class="grid content-between overflow-y-auto p-4 content-cardinfo">
         <div>
           <MTitle size="base">{{ revisita?.getName() }}</MTitle>
           <small class="text-gray-500 flex items-center justify-between"
@@ -88,7 +96,7 @@ const formattedNexDate = computed(() => {
               /> </span
           ></small>
         </div>
-        <div class="datetime text-nowrap">
+        <div class="datetime text-nowrap overflow-x-auto">
           <MTitle
             class="autohide"
             size="base"
@@ -120,11 +128,24 @@ const formattedNexDate = computed(() => {
               v-for="cita in sortedCitas"
               class="my-2"
             >
-              <MTitle
-                class="w-full"
-                size="base"
-                >{{ showHuman(cita.getDateObj()) }}</MTitle
-              >
+              <div class="flex justify-between">
+                <MTitle
+                  class="w-full"
+                  size="base"
+                  >{{ showHuman(cita.getDateObj()) }}</MTitle
+                >
+                <button
+                  type="button"
+                  class="flex-1 p-2 rounded-xl bg-red-500 text-white text-nowrap text-xs"
+                  @click="onDeleteCita(cita)"
+                >
+                  <HugeiconsIcon
+                    :icon="Delete02Icon"
+                    :size="16"
+                    :strokeWidth="1.5"
+                  />
+                </button>
+              </div>
               <p>{{ cita.getDescription() || 'No hay nota' }}</p>
             </div>
           </div>
@@ -152,7 +173,12 @@ const formattedNexDate = computed(() => {
 .absolute:focus-within {
   height: 100%;
 }
-
+.absolute .content-cardinfo {
+  @apply w-[calc(100%-6rem)];
+}
+.absolute:focus-within .content-cardinfo {
+  @apply w-full;
+}
 div[tabindex='0'] .autohide {
   display: none;
 }
@@ -176,6 +202,7 @@ div[tabindex='0']:focus-within {
 
   .datetime {
     margin-top: 0.5rem;
+    overflow: visible;
   }
 }
 </style>

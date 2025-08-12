@@ -81,6 +81,15 @@ async function onDeleteRevisita() {
     await loadRevisitas();
   }
 }
+async function onDeleteCita(cita: Cita) {
+  const repo = new CitaRepository();
+  await repo.delete(cita.getId());
+  if (!currentRevisita.value) {
+    return;
+  }
+  const revisita = currentRevisita.value as Revisita;
+  currentCitas.value = await getCitas(revisita);
+}
 interface ModalResponse {
   cita: Cita;
 }
@@ -164,6 +173,7 @@ onMounted(() => {
       :citas="currentCitas as Cita[]"
       @trash="onDeleteRevisita"
       @newCita="onCreateNewCita"
+      @trashCita="onDeleteCita"
     />
   </div>
 </template>
