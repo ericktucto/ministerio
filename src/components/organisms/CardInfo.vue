@@ -119,14 +119,18 @@ function onDeleteCita(cita: Cita) {
         <div class="autohide mt-4">
           <div class="grid w-full">
             <MTitle
-              class="w-full"
+              class="w-full mb-2"
               align="center"
               size="base"
               >Citas hechas</MTitle
             >
             <div
+              v-show="sortedCitas.length === 0"
+            >
+              <p class="text-center">No citas.</p>
+            </div>
+            <div
               v-for="cita in sortedCitas"
-              class="my-2"
             >
               <div class="flex justify-between">
                 <MTitle

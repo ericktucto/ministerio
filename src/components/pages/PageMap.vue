@@ -90,6 +90,16 @@ async function onDeleteRevisita() {
   }
 }
 async function onDeleteCita(cita: Cita) {
+  const result = await getModalFloat<ModalConfirm | ModalError>(
+    'deleteelement',
+    {
+      title: 'Eliminar Cita',
+    },
+  );
+  if ('error' in result) {
+    return;
+  }
+
   const repo = new CitaRepository();
   await repo.delete(cita.getId());
   if (!currentRevisita.value) {
