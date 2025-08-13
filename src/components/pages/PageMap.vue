@@ -11,6 +11,7 @@ import TopActionMap from '@/components/organisms/TopActionMap.vue';
 import Cita from '@/models/cita';
 import CitaRepository from '@/repositories/cita';
 import { getModal, type ModalError } from '@/modal';
+import { getModal as getModalFloat } from '@/modalfloat';
 
 // dom references
 const addrev = ref<HTMLElement | null>(null);
@@ -60,9 +61,16 @@ async function onNewRevisita(revisita: Revisita) {
   map.value?.addMarker(revisitaToMarker(revisita));
   await loadRevisitas();
 }
+
 async function onDeleteRevisita() {
   const repo = new RevisitaRepository();
-  const response = confirm('¿Borrar revisita?');
+  const result = await getModalFloat<ModalConfirm | ModalError>(
+    'deleteelement',
+    {
+      title: 'Eliminar Revisita',
+    },
+  );
+  const response = !('error' in result) && result.accept;
   if (response && currentRevisita.value) {
     // delete revisita
     const id = currentRevisita.value.getId();
@@ -92,6 +100,9 @@ async function onDeleteCita(cita: Cita) {
 }
 interface ModalResponse {
   cita: Cita;
+}
+interface ModalConfirm {
+  accept: boolean;
 }
 async function onCreateNewCita() {
   if (!currentRevisita.value) {
